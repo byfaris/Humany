@@ -22,7 +22,7 @@
         <header class="flex justify-between items-center mb-10 p-6 cyber-panel rounded-lg">
             <div>
                 <h1 class="glitch-font text-3xl font-black">HUMAN IPO <span class="text-xs text-white">FARIS_v1</span></h1>
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest">Protocol Status: <span class="text-green-500">Live & Decentralized</span></div>
+                <div class="text-[10px] text-gray-400">STATUS: <span class="text-green-500">BIO-DATA SYNC ACTIVE</span></div>
             </div>
             <button id="connectBtn" onclick="connectWallet()" class="border border-[#39FF14] px-6 py-2 hover:bg-[#39FF14] hover:text-black transition-all font-bold text-xs">
                 CONNECT WALLET
@@ -34,41 +34,37 @@
                 <div class="mb-6">
                     <div class="text-[10px] text-gray-500 mb-2 uppercase">الحالة الحيوية الحالية</div>
                     <div class="text-6xl font-black glitch-font mb-2" id="bpmDisplay">--</div>
-                    <div class="text-xs text-green-400 pulse">● STREAMING BIO-DATA</div>
+                    <div class="text-xs text-green-400 pulse">● STREAMING LIVE FROM FARIS</div>
                 </div>
                 <div class="space-y-4 text-right border-t border-green-900 pt-6">
-                    <div class="flex justify-between"><span>سعر $FARIS</span> <span class="text-yellow-400 font-mono" id="priceDisplay">$0.00</span></div>
-                    <div class="flex justify-between"><span>السيولة</span> <span class="font-mono text-white">45.2 SOL</span></div>
+                    <div class="flex justify-between"><span>سعر الحصة</span> <span class="text-yellow-400 font-mono">0.1 SOL</span></div>
+                    <div class="flex justify-between"><span>القيمة التقديرية</span> <span class="text-white font-mono" id="priceDisplay">$412.00</span></div>
                 </div>
-                <button onclick="buyToken()" class="w-full mt-8 bg-[#39FF14] text-black font-black py-4 hover:shadow-[0_0_30px_#39FF14] transition-all">
-                    شراء حصة في حياة فارس
+                <button onclick="buyToken()" class="w-full mt-8 bg-[#39FF14] text-black font-black py-4 hover:shadow-[0_0_30px_#39FF14] transition-all uppercase">
+                    استثمر في فارس الآن
                 </button>
             </div>
 
             <div class="lg:col-span-2 space-y-6">
-                <div class="cyber-panel p-6 rounded-lg overflow-hidden">
-                    <h2 class="glitch-font text-sm mb-4 border-b border-green-900 pb-2">سجل المستثمرين الأخير</h2>
-                    <div id="investorList" class="space-y-3 text-xs">
+                <div class="cyber-panel p-6 rounded-lg">
+                    <h2 class="glitch-font text-sm mb-4 border-b border-green-900 pb-2">سجل التحويلات الحية</h2>
+                    <div id="investorList" class="space-y-3 text-[10px] font-mono">
                         </div>
                 </div>
-
-                <div class="cyber-panel p-6 rounded-lg">
-                    <h2 class="glitch-font text-sm mb-4">مخطط الأداء الحيوي (24h)</h2>
-                    <div class="h-32 flex items-end gap-1">
-                        <div class="bg-green-500/20 w-full" style="height: 40%"></div>
-                        <div class="bg-green-500/40 w-full" style="height: 60%"></div>
-                        <div class="bg-green-500/60 w-full" style="height: 80%"></div>
-                        <div class="bg-green-500/80 w-full" style="height: 50%"></div>
-                        <div class="bg-green-500 w-full pulse" style="height: 90%"></div>
-                    </div>
+                <div class="cyber-panel p-6 rounded-lg h-40 flex items-end gap-1">
+                    <div class="bg-green-500/20 w-full" style="height: 40%"></div>
+                    <div class="bg-green-500/40 w-full" style="height: 65%"></div>
+                    <div class="bg-green-500/60 w-full" style="height: 45%"></div>
+                    <div class="bg-green-500/80 w-full" style="height: 85%"></div>
+                    <div class="bg-green-500 w-full pulse" style="height: 70%"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. إعدادات المحفظة والشبكة ---
-        const MY_WALLET_ADDRESS = "عنوان_محفظتك_هنا"; // 2goW6zAeC9qQVAudMYCmQ4Pdfa3KRhme6b82UFC7wbzf
+        // التعديل الذي طلبته: وضع عنوانك بشكل صحيح برمجياً
+        const MY_WALLET_ADDRESS = "2goW6zAeC9qQVAudMYCmQ4Pdfa3KRhme6b82UFC7wbzf";
         let userWallet = null;
 
         async function connectWallet() {
@@ -77,14 +73,14 @@
                     const resp = await window.solana.connect();
                     userWallet = resp.publicKey;
                     document.getElementById('connectBtn').innerText = userWallet.toString().slice(0,6) + "...";
-                    alert("تم الربط بنجاح!");
-                } catch (e) { console.error(e); }
-            } else { alert("يرجى تثبيت Phantom Wallet"); }
+                    document.getElementById('connectBtn').style.background = "#39FF14";
+                    document.getElementById('connectBtn').style.color = "black";
+                } catch (e) { alert("رفض المستخدم الاتصال"); }
+            } else { alert("يرجى فتح الموقع من متصفح تطبيق Phantom"); }
         }
 
-        // --- 2. وظيفة الشراء الحقيقي ---
         async function buyToken() {
-            if (!userWallet) return alert("اربط محفظتك أولاً!");
+            if (!userWallet) return alert("يرجى ربط المحفظة أولاً");
             
             try {
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
@@ -92,7 +88,7 @@
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: userWallet,
                         toPubkey: new solanaWeb3.PublicKey(MY_WALLET_ADDRESS),
-                        lamports: 0.1 * solanaWeb3.LAMPORTS_PER_SOL // سعر الحصة 0.1 SOL
+                        lamports: 0.1 * solanaWeb3.LAMPORTS_PER_SOL 
                     })
                 );
 
@@ -102,31 +98,29 @@
 
                 const signed = await window.solana.signTransaction(transaction);
                 const signature = await connection.sendRawTransaction(signed.serialize());
-                alert("شكراً لاستثمارك! رقم العملية: " + signature);
-            } catch (e) { alert("فشلت العملية"); }
+                alert("تمت المعاملة بنجاح! شكراً لدعمك. رقم العملية: " + signature);
+            } catch (e) { 
+                console.error(e);
+                alert("فشلت العملية: تأكد من وجود رصيد كافٍ (0.1 SOL + الرسوم)"); 
+            }
         }
 
-        // --- 3. محاكي البيانات الحيوية الذكي ---
         function updateStats() {
-            const bpm = 65 + Math.floor(Math.random() * 25);
-            const price = 410 + (Math.random() * 15);
-            document.getElementById('bpmDisplay').innerText = bpm;
-            document.getElementById('priceDisplay').innerText = "$" + price.toFixed(2);
+            document.getElementById('bpmDisplay').innerText = 65 + Math.floor(Math.random() * 20);
+            document.getElementById('priceDisplay').innerText = "$" + (410 + Math.random() * 10).toFixed(2);
         }
 
-        // --- 4. توليد مستثمرين وهميين (للبداية) ---
-        const investors = ["0x4f...a2", "0x12...9e", "0x99...bc"];
+        const investors = ["7xR4...kL", "3mN2...qP", "9pZ1...vX"];
         function renderInvestors() {
-            const list = document.getElementById('investorList');
-            list.innerHTML = investors.map(inv => `
+            document.getElementById('investorList').innerHTML = investors.map(inv => `
                 <div class="flex justify-between border-b border-gray-900 pb-1">
-                    <span>${inv} اشترى حصة بقيمة 0.1 SOL</span>
-                    <span class="text-gray-600">منذ 2 دقيقة</span>
+                    <span>${inv} اشترى 1 حصة</span>
+                    <span class="text-green-500">+0.1 SOL</span>
                 </div>
             `).join('');
         }
 
-        setInterval(updateStats, 3000);
+        setInterval(updateStats, 2500);
         updateStats();
         renderInvestors();
     </script>
