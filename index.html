@@ -1,128 +1,184 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دراما رمضان 2026 | المشاهدة الحصرية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Palestine Pulse | Global Live Monitor</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Tajawal', sans-serif; 
-            background-color: #0b0f19; 
-            color: #ffffff; 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        :root {
+            --accent: #ffcc00;
+            --glass: rgba(0, 0, 0, 0.8);
+            --safe-area: 20px;
         }
-        .container { width: 100%; max-width: 500px; padding: 20px; }
+
+        /* الأساسيات ودعم المتصفحات */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* رأس الصفحة */
-        .header { 
-            text-align: center; 
-            padding: 40px 20px; 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
-            border-radius: 0 0 30px 30px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            margin-bottom: 30px;
-            border-bottom: 2px solid #38bdf8;
-        }
-        h1 { margin: 0; font-size: 28px; color: #38bdf8; }
-        .tagline { font-size: 14px; color: #94a3b8; margin-top: 10px; }
-
-        /* منطقة الإعلانات */
-        .ads-banner {
-            width: 100%;
-            background: #1e293b;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px dashed #38bdf8;
-            font-size: 13px;
-        }
-
-        /* بطاقات المسلسلات */
-        .movie-card {
-            background: #161e2e;
-            border-radius: 20px;
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: #000; color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            border: 1px solid #1e293b;
-            transition: transform 0.3s ease;
         }
-        .movie-card:hover { transform: translateY(-5px); }
-        .movie-img { 
-            width: 100%; 
-            height: 250px; 
-            object-fit: cover; 
-            background: #2d3748;
+
+        /* الخريطة */
+        #map {
+            position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1;
         }
-        .movie-info { padding: 20px; text-align: center; }
-        .movie-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
-        .movie-desc { font-size: 14px; color: #94a3b8; margin-bottom: 20px; }
 
-        /* أزرار التحويل للتلجرام */
-        .btn-tg {
-            display: block;
-            background: linear-gradient(90deg, #0088cc, #00aaff);
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            transition: 0.3s;
+        /* الشريط العلوي - دعم Safari و Chrome */
+        .navbar {
+            position: absolute; top: 0; width: 100%; z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            display: -webkit-flex; display: flex;
+            justify-content: space-between; align-items: center;
+            padding: 25px 40px;
         }
-        .btn-tg:active { transform: scale(0.95); }
 
-        footer { margin-top: 20px; padding-bottom: 30px; font-size: 12px; color: #475569; }
+        .logo {
+            font-weight: 800; letter-spacing: 2px;
+            border-left: 3px solid #ce1126; padding-left: 12px;
+            font-size: 1.2rem;
+        }
 
+        /* محول اللغات - تصميم Apple Style */
+        .lang-switcher {
+            display: -webkit-flex; display: flex;
+            gap: 8px; background: rgba(255,255,255,0.1);
+            padding: 4px; border-radius: 12px;
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        }
+
+        .lang-btn {
+            background: none; border: none; color: #fff;
+            padding: 6px 14px; cursor: pointer; border-radius: 8px;
+            font-size: 0.8rem; transition: all 0.2s ease;
+        }
+
+        .lang-btn.active { background: #fff; color: #000; font-weight: 600; }
+
+        /* لوحة العداد - متوافقة مع جميع القياسات */
+        .info-card {
+            position: absolute; bottom: var(--safe-area); right: var(--safe-area); z-index: 10;
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            padding: 25px; border-radius: 24px; width: 340px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .countdown-grid {
+            display: -webkit-flex; display: flex;
+            justify-content: space-between; margin-top: 20px;
+        }
+
+        .unit-box { text-align: center; }
+        .unit-box .num { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+        .unit-box .label { font-size: 0.65rem; color: #aaa; text-transform: uppercase; margin-top: 8px; }
+
+        /* شريط الأخبار السفلي */
+        .ticker {
+            position: absolute; bottom: var(--safe-area); left: var(--safe-area); z-index: 10;
+            background: rgba(0,0,0,0.6); padding: 12px 20px;
+            border-radius: 50px; display: -webkit-flex; display: flex;
+            align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05);
+            max-width: 40%;
+        }
+
+        .dot { width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; -webkit-animation: pulse 1.5s infinite; animation: pulse 1.5s infinite; }
+
+        @-webkit-keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* دعم الشاشات الصغيرة (Mobile) */
+        @media (max-width: 768px) {
+            .navbar { padding: 20px; }
+            .info-card { width: calc(100% - 40px); left: 20px; bottom: 80px; }
+            .ticker { max-width: 90%; bottom: 20px; font-size: 0.8rem; }
+            .logo { font-size: 1rem; }
+        }
+
+        .rtl { direction: rtl; text-align: right; }
+        .rtl .logo { border-left: none; border-right: 3px solid #ce1126; padding-left: 0; padding-right: 12px; }
     </style>
-
-    </head>
+</head>
 <body>
 
-<div class="header">
-    <h1>فارس تي في 🌙</h1>
-    <div class="tagline">تغطية حصرية لمسلسلات رمضان 2026 قبل الجميع</div>
-</div>
+    <nav class="navbar">
+        <div class="logo" id="ui-logo">PALESTINE PULSE</div>
+        <div class="lang-switcher">
+            <button class="lang-btn active" onclick="updateLang('en')" id="btn-en">EN</button>
+            <button class="lang-btn" onclick="updateLang('ar')" id="btn-ar">العربية</button>
+            <button class="lang-btn" onclick="updateLang('zh')" id="btn-zh">中文</button>
+        </div>
+    </nav>
 
-<div class="container">
-    
-    <div class="ads-banner">
-        📢 سيتم رفع الحلقات يومياً فور عرضها في القناة
+    <div id="map"></div>
+
+    <div class="ticker">
+        <div class="dot"></div>
+        <span id="ui-ticker">Live updates from the ground...</span>
     </div>
 
-    <div class="movie-card">
-        <img src="https://images.unsplash.com/photo-1594908900066-3f47337549d8?auto=format&fit=crop&w=500&q=80" alt="مسلسل 1" class="movie-img">
-        <div class="movie-info">
-            <div class="movie-title">شباب البومب 14</div>
-            <div class="movie-desc">شاهد جميع حلقات عامر وأصحابه حصرياً وبدون فواصل إعلانية مملة.</div>
-            <a href="https://t.me/ramadan26tv" class="btn-tg">انقر للمشاهدة في تلجرام</a>
+    <div class="info-card" id="ui-card">
+        <div id="ui-timer-title" style="font-size: 0.75rem; color: #888; letter-spacing: 1px;">80-YEAR STRUCTURAL DECLINE</div>
+        <div class="countdown-grid">
+            <div class="unit-box"><div class="num" id="d">00</div><div class="label" id="lbl-d">Days</div></div>
+            <div class="unit-box"><div class="num" id="h">00</div><div class="label" id="lbl-h">Hrs</div></div>
+            <div class="unit-box"><div class="num" id="m">00</div><div class="label" id="lbl-m">Min</div></div>
+            <div class="unit-box"><div class="num" id="s">00</div><div class="label" id="lbl-s">Sec</div></div>
         </div>
     </div>
 
-    <div class="movie-card">
-        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80" alt="مسلسل 2" class="movie-img">
-        <div class="movie-info">
-            <div class="movie-title">مسلسلات الخليج الحصرية</div>
-            <div class="movie-desc">تسريبات وكواليس ومواعيد العرض المحدثة لحظة بلحظة.</div>
-            <a href="https://t.me/ramadan26tv" class="btn-tg">دخول القناة الرسمية</a>
-        </div>
-    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // الخريطة - دعم جميع المتصفحات لصور القمر الصناعي
+        var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([31.6, 34.9], 8);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-    <div style="text-align:center;">
-        <p style="font-size: 13px; color: #38bdf8;">اشترك في القناة لتصلك تنبيهات الحلقات 🔔</p>
-    </div>
+        const translations = {
+            en: { logo: "PALESTINE PULSE", ticker: "Live updates from the ground...", title: "80-YEAR STRUCTURAL DECLINE", d: "Days", h: "Hrs", m: "Min", s: "Sec", rtl: false },
+            ar: { logo: "نبض فلسطين", ticker: "تحديثات مباشرة من الميدان...", title: "مؤشر عقدة الثمانين عاماً", d: "يوم", h: "ساعة", m: "دقيقة", s: "ثانية", rtl: true },
+            zh: { logo: "巴勒斯坦脉搏", ticker: "来自现场的实时更新...", title: "八十年周期结构性衰竭", d: "天", h: "时", m: "分", s: "秒", rtl: false }
+        };
 
-    <footer>
-        &copy; 2026 Faris TV - جميع الحقوق محفوظة لجمهور رمضان
-    </footer>
-</div>
+        function updateLang(lang) {
+            const t = translations[lang];
+            document.getElementById('ui-logo').innerText = t.logo;
+            document.getElementById('ui-ticker').innerText = t.ticker;
+            document.getElementById('ui-timer-title').innerText = t.title;
+            document.getElementById('lbl-d').innerText = t.d;
+            document.getElementById('lbl-h').innerText = t.h;
+            document.getElementById('lbl-m').innerText = t.m;
+            document.getElementById('lbl-s').innerText = t.s;
+            
+            // تغيير الاتجاه
+            document.getElementById('ui-card').className = t.rtl ? "info-card rtl" : "info-card";
+            document.body.style.direction = t.rtl ? "rtl" : "ltr";
 
+            // تحديث الأزرار
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+        }
+
+        // العداد التنازلي (14 مايو 2028)
+        const targetDate = new Date("May 14, 2028 00:00:00").getTime();
+        function updateTimer() {
+            const now = new Date().getTime();
+            const gap = targetDate - now;
+
+            if (gap > 0) {
+                document.getElementById("d").innerText = Math.floor(gap / (1000 * 60 * 60 * 24));
+                document.getElementById("h").innerText = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById("m").innerText = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById("s").innerText = Math.floor((gap % (1000 * 60)) / 1000);
+            }
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
 </body>
 </html>
